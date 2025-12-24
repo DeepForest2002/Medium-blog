@@ -34,7 +34,7 @@ export const userRelations = relations(users, ({ many }) => ({
   Posts: many(Posts),
 }));
 
-// post with user relationship is many posts can only have one user
+// post with user relationship is many posts can  have one user
 export const PostRelations = relations(Posts, ({ one }) => ({
   author: one(users, {
     fields: [Posts.authorId],
