@@ -1,12 +1,19 @@
 import { Hono } from "hono";
-import { CreateUser, findUserByEmail } from "../action/user.action";
+import {
+  CreateUser,
+  findUserByEmail,
+  findUserEmail_And_Password,
+} from "../action/user.action";
 import { sign } from "hono/jwt";
+import { authMiddleware } from "../middlewares/auth.middleware";
 export const UserRoutes = new Hono<{
   Bindings: {
     DATABASE_URL: string;
     JWT_SECRET: string;
   };
 }>();
+
+UserRoutes.use("/api/v1/blog/*", authMiddleware);
 
 UserRoutes.get("/", (c) => {
   return c.text("Everthing is working fine");
@@ -26,4 +33,31 @@ UserRoutes.post("/api/v1/signup", async (c) => {
   return c.json({
     token: token,
   });
+});
+
+//Now Create a signin route
+UserRoutes.post("/api/v1/signin", async (c) => {
+  //first user need to give their username
+  const { email, password } = await c.req.json();
+  if (!email || !password) {
+    return c.json({ msg: "Password and email are required" }, 409);
+  }
+  const user = await findUserEmail_And_Password(
+    email,
+    password,
+    c.env.DATABASE_URL
+  );
+  if (user === null)
+    return c.json({ msg: "email or password is invalid" }, 409);
+  const token = await sign(
+    { id: user.id, email: user.email },
+    c.env.JWT_SECRET
+  );
+  return c.json(
+    {
+      msg: "Login Ok",
+      token: token,
+    },
+    200
+  );
 });

@@ -1,6 +1,8 @@
 import { createDb } from "../db";
 import { users } from "../db/schema";
-import { eq } from "drizzle-orm";
+import { eq, and } from "drizzle-orm";
+import bcrypt from "bcryptjs";
+
 type UserType = {
   name: string;
   email: string;
@@ -25,4 +27,19 @@ export async function findUserByEmail(email: string, databaseUrl: string) {
     .limit(1);
 
   return result[0] ?? null;
+}
+
+export async function findUserEmail_And_Password(
+  email: string,
+  password: string,
+  databaseUrl: string
+) {
+  const db = createDb(databaseUrl);
+  const user = await db
+    .select()
+    .from(users)
+    .where(and(eq(users.email, email), eq(users.password, password)))
+    .limit(1);
+  if (user.length > 0) return user[0];
+  return null;
 }
