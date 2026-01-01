@@ -23,6 +23,7 @@ export const Posts = pgTable("Posts", {
   title: text("title").notNull(),
   content: text("content").notNull(),
   published: boolean().default(false),
+  createdAt: timestamp().defaultNow(),
   authorId: integer().references(() => users.id, {
     onDelete: "cascade",
   }),

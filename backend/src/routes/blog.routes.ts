@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import { authMiddleware } from "../middlewares/auth.middleware";
-
+import { CreatePost, UpdatePost, FindPost } from "../action/posts.action";
 export const blogRoutes = new Hono<{
   Bindings: {
     JWT_SECRET: string;
@@ -8,4 +8,56 @@ export const blogRoutes = new Hono<{
   };
 }>();
 
-blogRoutes.use("*", authMiddleware);
+blogRoutes.use("/*", authMiddleware);
+
+blogRoutes.post("/createPost", async (c) => {
+  const { title, content, authorId } = await c.req.json();
+  if (!title || !authorId || !content)
+    return c.json({ msg: "All Fields are required" }, 400);
+  const post = await CreatePost(
+    { title, content, authorId },
+    c.env.DATABASE_URL
+  );
+  if (!post) return c.json({ msg: "Post cannot be cretaed" }, 409);
+  return c.json(
+    {
+      msg: "Post Created",
+      post: post.id,
+    },
+    200
+  );
+});
+
+//Create a route to update the blog
+blogRoutes.put("/updateBlog", async (c) => {
+  // update the blog where id + authorid
+  const { id, title, content, authorId } = await c.req.json();
+  if (!id || !authorId)
+    return c.json({ msg: "Both authorId and Post id is required" }, 400);
+  const updated_post = await UpdatePost(
+    { id, title, content, authorId },
+    c.env.DATABASE_URL
+  );
+  if (!updated_post)
+    return c.json({ msg: "Post cannot be updated due to some error" }, 409);
+  return c.json({
+    msg: "Post Updated",
+    PostId: updated_post.id,
+  });
+});
+
+// Create a route to get a blog
+blogRoutes.get("/getBlog/:id", async (c) => {
+  const authorId = c.req.param("id");
+  if (!authorId) return c.json({ msg: "AuthorId is not found" }, 400);
+  const id = Number(authorId);
+  if (Number.isNaN(id)) return c.json({ msg: "Invalid author id" }, 400);
+  const find_post = await FindPost(id, c.env.DATABASE_URL);
+  if (find_post === null)
+    return c.json({ msg: "This post is not present" }, 409);
+  return c.json({
+    msg: "Post is present",
+    title: find_post.title,
+    content: find_post.content,
+  });
+});
