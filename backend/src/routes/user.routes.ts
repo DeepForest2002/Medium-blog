@@ -5,7 +5,6 @@ import {
   findUserEmail_And_Password,
 } from "../action/user.action";
 import { sign } from "hono/jwt";
-import { authMiddleware } from "../middlewares/auth.middleware";
 export const UserRoutes = new Hono<{
   Bindings: {
     DATABASE_URL: string;
@@ -13,13 +12,11 @@ export const UserRoutes = new Hono<{
   };
 }>();
 
-UserRoutes.use("/api/v1/blog/*", authMiddleware);
-
 UserRoutes.get("/", (c) => {
   return c.text("Everthing is working fine");
 });
 
-UserRoutes.post("/api/v1/signup", async (c) => {
+UserRoutes.post("/signup", async (c) => {
   const { name, email, password } = await c.req.json();
   if (!name || !email || !password) {
     return c.json({ error: "All fields are required" }, 400);
@@ -36,7 +33,7 @@ UserRoutes.post("/api/v1/signup", async (c) => {
 });
 
 //Now Create a signin route
-UserRoutes.post("/api/v1/signin", async (c) => {
+UserRoutes.post("/signin", async (c) => {
   //first user need to give their username
   const { email, password } = await c.req.json();
   if (!email || !password) {
