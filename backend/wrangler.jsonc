@@ -7,6 +7,7 @@
   //   "nodejs_compat"
   // ],
   "vars": {
+    "DATABASE_URL": "postgresql://neondb_owner:npg_N4B3UWwjoSdl@ep-curly-fire-ad0uvj52-pooler.c-2.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require",
     "JWT_SECRET": "ABCD1234"
   }
   // "kv_namespaces": [

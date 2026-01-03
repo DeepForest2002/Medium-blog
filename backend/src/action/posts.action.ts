@@ -44,3 +44,10 @@ export async function FindPost(id: number, databaseUrl: string) {
   if (post.length > 0) return post[0];
   else return null;
 }
+
+export async function GetAllBlogs(databaseUrl: string) {
+  const db = createDb(databaseUrl);
+  const [result] = await db.select().from(Posts).limit(10);
+  if (!result) return null;
+  else return result;
+}

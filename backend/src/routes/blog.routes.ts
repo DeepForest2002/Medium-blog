@@ -1,6 +1,11 @@
 import { Hono } from "hono";
 import { authMiddleware } from "../middlewares/auth.middleware";
-import { CreatePost, UpdatePost, FindPost } from "../action/posts.action";
+import {
+  CreatePost,
+  UpdatePost,
+  FindPost,
+  GetAllBlogs,
+} from "../action/posts.action";
 export const blogRoutes = new Hono<{
   Bindings: {
     JWT_SECRET: string;
@@ -59,5 +64,13 @@ blogRoutes.get("/getBlog/:id", async (c) => {
     msg: "Post is present",
     title: find_post.title,
     content: find_post.content,
+  });
+});
+
+blogRoutes.get("/bulk", async (c) => {
+  const result = await GetAllBlogs(c.env.DATABASE_URL);
+  if (result === null) return c.json({ msg: "No Blogs present" }, 409);
+  return c.json({
+    result: [result],
   });
 });
