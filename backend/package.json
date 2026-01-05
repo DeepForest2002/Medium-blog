@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.0.2",
+    "@sayan_pramanik2002/common-type": "^1.0.4",
     "bcryptjs": "^3.0.3",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
