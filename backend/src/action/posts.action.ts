@@ -22,8 +22,8 @@ export async function CreatePost(data: PostsType, databaseUrl: string) {
 
 type UpdateTypes = {
   id: number;
-  title: string;
-  content: string;
+  title?: string;
+  content?: string;
   authorId: number;
 };
 

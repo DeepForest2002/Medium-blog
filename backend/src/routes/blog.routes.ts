@@ -1,6 +1,10 @@
 import { Hono } from "hono";
 import { authMiddleware } from "../middlewares/auth.middleware";
 import {
+  createPostInput,
+  updatePostInput,
+} from "@sayan_pramanik2002/common-type";
+import {
   CreatePost,
   UpdatePost,
   FindPost,
@@ -17,8 +21,14 @@ blogRoutes.use("/*", authMiddleware);
 
 blogRoutes.post("/createPost", async (c) => {
   const { title, content, authorId } = await c.req.json();
-  if (!title || !authorId || !content)
-    return c.json({ msg: "All Fields are required" }, 400);
+  const result = createPostInput.safeParse({
+    title: title,
+    content: content,
+    authorId: authorId,
+  });
+  if (!result.success) {
+    return c.json({ msg: "Invalid Inputs" }, 400);
+  }
   const post = await CreatePost(
     { title, content, authorId },
     c.env.DATABASE_URL
@@ -37,8 +47,10 @@ blogRoutes.post("/createPost", async (c) => {
 blogRoutes.put("/updateBlog", async (c) => {
   // update the blog where id + authorid
   const { id, title, content, authorId } = await c.req.json();
-  if (!id || !authorId)
-    return c.json({ msg: "Both authorId and Post id is required" }, 400);
+  const result = updatePostInput.safeParse({ id: id, authorId: id });
+  if (!result.success) {
+    return c.json({ msg: "Invalid inputs" }, 400);
+  }
   const updated_post = await UpdatePost(
     { id, title, content, authorId },
     c.env.DATABASE_URL

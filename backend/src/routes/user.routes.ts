@@ -5,7 +5,7 @@ import {
   findUserEmail_And_Password,
 } from "../action/user.action";
 import { sign } from "hono/jwt";
-import { signinInput } from "@sayan_pramanik2002/common-type";
+import { signinInput, signupInput } from "@sayan_pramanik2002/common-type";
 export const UserRoutes = new Hono<{
   Bindings: {
     DATABASE_URL: string;
@@ -14,13 +14,23 @@ export const UserRoutes = new Hono<{
 }>();
 
 UserRoutes.get("/", (c) => {
-  return c.text("Everthing is working fine");
+  return c.text("This is user page");
 });
 
 UserRoutes.post("/signup", async (c) => {
   const { name, email, password } = await c.req.json();
-  if (!name || !email || !password) {
-    return c.json({ error: "All fields are required" }, 400);
+  const result = signupInput.safeParse({
+    name: name,
+    email: email,
+    password: password,
+  });
+  if (!result.success) {
+    return c.json(
+      {
+        msg: "Invalid input",
+      },
+      400
+    );
   }
 
   //find the user
@@ -37,8 +47,14 @@ UserRoutes.post("/signup", async (c) => {
 UserRoutes.post("/signin", async (c) => {
   //first user need to give their username
   const { email, password } = await c.req.json();
-  if (!email || !password) {
-    return c.json({ msg: "Password and email are required" }, 409);
+  const result = signinInput.safeParse({ email: email, password: password });
+  if (!result.success) {
+    return c.json(
+      {
+        msg: "Invalid inputs",
+      },
+      400
+    );
   }
   const user = await findUserEmail_And_Password(
     email,
