@@ -1,9 +1,12 @@
+import type { ChangeEvent } from "react";
 type LabelTypes = {
   id: string;
   type: string;
   name: string;
   placeholder: string;
   labelText: string;
+  value?: string;
+  onChange?: (e: ChangeEvent<HTMLInputElement>) => void;
 };
 
 export const Label = ({
@@ -12,6 +15,8 @@ export const Label = ({
   name,
   placeholder,
   labelText,
+  onChange,
+  value,
 }: LabelTypes) => {
   return (
     <div>
@@ -23,7 +28,9 @@ export const Label = ({
         name={name}
         placeholder={placeholder}
         id={id}
-        className="p-2 w-[100%] rounded-md border-2 border-gray-400"
+        className="p-2 w-[100%] rounded-md border-2 border-gray-400 mt-2"
+        onChange={onChange}
+        value={value}
       />
     </div>
   );

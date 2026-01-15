@@ -1,6 +1,35 @@
-import { Label } from "../components/labels";
-import { Link } from "react-router-dom";
+import { Label } from "../components/Labels";
+import { Link, useNavigate } from "react-router-dom";
+import type { signupType } from "@sayan_pramanik2002/common-type";
+import { useState } from "react";
+import axios from "axios";
+import toast, { Toaster } from "react-hot-toast";
+
+import { BACKEND_URL } from "../config";
+
 export const Signup = () => {
+  const navigate = useNavigate();
+  const [signupInputs, setSignupInputs] = useState<signupType>({
+    name: "",
+    email: "",
+    password: "",
+  });
+
+  //now write the signup button onClick function
+  async function OnclickHandle() {
+    try {
+      const response = await axios.post(
+        `${BACKEND_URL}/api/v1/user/signup`,
+        signupInputs
+      );
+      const jwt = response.data.token;
+      localStorage.setItem("token", jwt);
+      navigate("/blogs");
+    } catch (e) {
+      alert(`Error while signing up`);
+    }
+  }
+
   return (
     <div>
       <div className="w-screen h-screen flex flex-row">
@@ -26,6 +55,13 @@ export const Signup = () => {
                 name="email"
                 placeholder="Enter your name"
                 labelText="Username"
+                value={signupInputs.name}
+                onChange={(e) => {
+                  setSignupInputs({
+                    ...signupInputs,
+                    name: e.target.value,
+                  });
+                }}
               />
               <Label
                 id="email"
@@ -33,6 +69,10 @@ export const Signup = () => {
                 name="email"
                 placeholder="abcd@gmail.com"
                 labelText="Email"
+                value={signupInputs.email}
+                onChange={(e) => {
+                  setSignupInputs({ ...signupInputs, email: e.target.value });
+                }}
               />
               <Label
                 id="password"
@@ -40,9 +80,19 @@ export const Signup = () => {
                 name="password"
                 placeholder="Enter your password"
                 labelText="Passowrd"
+                value={signupInputs.password}
+                onChange={(e) => {
+                  setSignupInputs({
+                    ...signupInputs,
+                    password: e.target.value,
+                  });
+                }}
               />
             </form>
-            <button className="w-[100%] p-2 font-bold text-xl text-white bg-black rounded-md">
+            <button
+              onClick={OnclickHandle}
+              className="w-[100%] p-2 font-bold text-xl text-white bg-black rounded-md"
+            >
               Signup
             </button>
           </div>
